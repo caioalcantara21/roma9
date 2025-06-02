@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Romanov Industries - Calculadora de Splits</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@400;500;700&display=swap');
+
+        :root {
+            --primary-red: #E53935;
+            --primary-red-darker: #C62828;
+            --accent-red: #FF5252;
+            --dark-bg: #121212; 
+            --content-bg: #1e1e1e; 
+            --input-bg: #2c2c2c; 
+            --input-bg-hover: #383838;
+            --light-text: #f5f5f5;
+            --medium-text: #bdbdbd;
+            --border-color: #333; 
+            --success-green: #66BB6A;
+        }
+
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--dark-bg);
+            /* Imagem de fundo (instruções mantidas) */
+            /*
+            background-image: linear-gradient(rgba(18, 18, 18, 0.9), rgba(18, 18, 18, 0.95)), url('gta-background.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            */
+            color: var(--light-text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2.5em, 6vw, 3.5em);
+            color: var(--primary-red);
+            text-shadow: 0 0 8px var(--accent-red), 0 0 15px var(--primary-red);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            background-color: var(--content-bg);
+            padding: clamp(20px, 5vw, 40px);
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            width: 100%;
+            max-width: 700px;
+            border: 1px solid var(--border-color);
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group legend,
+        .input-group label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 500;
+            color: var(--medium-text);
+            font-size: 1em;
+        }
+
+        .input-group input[type="number"] {
+            width: 100%;
+            padding: 15px 20px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--light-text);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1.1em;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .input-group input[type="number"]:focus {
+            border-color: var(--accent-red);
+            box-shadow: 0 0 0 0.2rem rgba(229, 57, 53, 0.3);
+            outline: none;
+        }
+
+        .client-options-tabs {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--input-bg);
+            border-radius: 10px;
+            padding: 6px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .client-options-tabs .tab-option input[type="radio"] {
+            display: none; 
+        }
+
+        .client-options-tabs .tab-option label {
+            display: block;
+            flex-grow: 1; 
+            text-align: center;
+            padding: 12px 10px; 
+            font-size: 0.95em;
+            font-weight: 500;
+            color: var(--medium-text);
+            background-color: transparent;
+            border-radius: 8px; 
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+            margin: 0 3px; 
+        }
+        .client-options-tabs .tab-option:first-child label { margin-left: 0; }
+        .client-options-tabs .tab-option:last-child label { margin-right: 0; }
+
+        .client-options-tabs .tab-option input[type="radio"]:checked + label {
+            background-color: var(--primary-red);
+            color: var(--light-text);
+            font-weight: 700;
+            box-shadow: 0 3px 8px rgba(229, 57, 53, 0.3);
+        }
+
+        .client-options-tabs .tab-option label:hover { 
+             background-color: var(--input-bg-hover);
+             color: var(--light-text);
+        }
+        .client-options-tabs .tab-option input[type="radio"]:checked + label:hover {
+            background-color: var(--primary-red-darker);
+        }
+
+        button#calculateButton {
+            color: var(--light-text);
+            padding: 16px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.25em;
+            font-weight: 700;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--primary-red), var(--accent-red));
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            z-index: 1;
+        }
+        button#calculateButton::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--accent-red), var(--primary-red-darker));
+            transition: left 0.4s ease;
+            z-index: -1;
+        }
+        button#calculateButton:hover::before {
+            left: 0;
+        }
+        button#calculateButton:hover {
+            box-shadow: 0 8px 20px rgba(229, 57, 53, 0.45);
+            transform: translateY(-3px);
+        }
+        button#calculateButton:active {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(229, 57, 53, 0.35);
+        }
+
+        .results {
+            margin-top: 35px;
+            padding: 30px;
+            background-color: var(--content-bg); 
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .results h2 {
+            margin-top: 0;
+            margin-bottom: 25px;
+            color: var(--primary-red);
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .results p {
+            margin: 15px 0;
+            font-size: 1.15em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+         .results p:last-of-type {
+            border-bottom: none;
+        }
+
+        .results .label {
+            font-weight: 500;
+            color: var(--medium-text);
+        }
+
+        .results .value {
+            font-weight: bold;
+            font-size: 1.05em;
+        }
+        .results .org-value { color: var(--primary-red); }
+        .results .cliente-value { color: var(--accent-red); }
+        .results .jogador-value { color: var(--success-green); }
+        .results .total-value { color: var(--light-text); }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: var(--medium-text);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>ROMANOV INDUSTRIES</h1>
+    </div>
+
+    <div class="container">
+        <div class="input-group">
+            <label for="valorDinheiro">Valor Total da Transação:</label>
+            <input type="number" id="valorDinheiro" placeholder="Ex: 1000000">
+        </div>
+
+        <fieldset class="input-group">
+            <legend>Escolha a porcentagem para o Cliente:</legend>
+            <div class="client-options-tabs">
+                <div class="tab-option">
+                    <input type="radio" id="tipoGeral" name="tipoCliente" value="geral" checked>
+                    <label for="tipoGeral">Geral (35%)</label>
+                </div>
+                <div class="tab-option">
+                    <input type="radio" id="tipoParceria" name="tipoCliente" value="parceria">
+                    <label for="tipoParceria">Parceria (40%)</label>
+                </div>
+                <div class="tab-option">
+                    <input type="radio" id="tipoAlianca" name="tipoCliente" value="alianca">
+                    <label for="tipoAlianca">Aliança (45%)</label>
+                </div>
+            </div>
+        </fieldset>
+
+        <button id="calculateButton" onclick="calcularSplits()">Calcular Divisão</button>
+
+        <div class="results" id="resultadosDiv" style="display: none;">
+            <h2>Divisão de Valores</h2>
+            <p><span class="label">ROMANOV INDUSTRIES (50%):</span> <span id="orgValor" class="value org-value"></span></p>
+            <p><span class="label">CLIENTE (<span id="clientePercentText"></span>% do total):</span> <span id="clienteValor" class="value cliente-value"></span></p>
+            <p><span class="label">VOCÊ (<span id="jogadorPercentText"></span>% do total):</span> <span id="jogadorValor" class="value jogador-value"></span></p>
+            <hr style="border-color: var(--border-color); margin: 20px 0; border-style: solid;">
+            <p><span class="label">VALOR ORIGINAL:</span> <span id="totalOriginal" class="value total-value"></span></p>
+        </div>
+    </div>
+
+    <p class="footer-note">Romanov Industries - Eficiência e Poder.</p>
+
+    <script>
+        const PORCENTAGEM_ORGANIZACAO = 0.50; 
+
+        function formatarDinheiro(valor) {
+            return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function calcularSplits() {
+            try {
+                const valorTotalInput = document.getElementById('valorDinheiro');
+                const valorTotal = parseFloat(valorTotalInput.value);
+
+                if (isNaN(valorTotal) || valorTotal <= 0) {
+                    alert("Por favor, insira um valor total válido e positivo.");
+                    if (valorTotalInput) valorTotalInput.focus(); 
+                    const resultadosDiv = document.getElementById('resultadosDiv');
+                    if (resultadosDiv) resultadosDiv.style.display = 'none'; 
+                    return;
+                }
+
+                let porcentagemClienteDecimal;
+                const tipoClienteSelecionado = document.querySelector('input[name="tipoCliente"]:checked');
+                
+                if (!tipoClienteSelecionado) { 
+                    alert("ERRO INTERNO: Nenhuma opção de cliente está selecionada. Por favor, recarregue a página ou contate o suporte.");
+                    const resultadosDiv = document.getElementById('resultadosDiv');
+                    if (resultadosDiv) resultadosDiv.style.display = 'none';
+                    return;
+                }
+                const tipoClienteValue = tipoClienteSelecionado.value;
+
+                if (tipoClienteValue === 'geral') {
+                    porcentagemClienteDecimal = 0.35;
+                } else if (tipoClienteValue === 'parceria') {
+                    porcentagemClienteDecimal = 0.40;
+                } else if (tipoClienteValue === 'alianca') { 
+                    porcentagemClienteDecimal = 0.45;
+                } else {
+                    alert("ERRO INTERNO: Tipo de cliente desconhecido - " + tipoClienteValue);
+                    const resultadosDiv = document.getElementById('resultadosDiv');
+                    if (resultadosDiv) resultadosDiv.style.display = 'none';
+                    return;
+                }
+
+                const valorOrganizaçao = valorTotal * PORCENTAGEM_ORGANIZACAO;
+                const valorCliente = valorTotal * porcentagemClienteDecimal;
+                const porcentagemJogadorDecimal = 1.0 - PORCENTAGEM_ORGANIZACAO - porcentagemClienteDecimal;
+                const valorJogador = valorTotal * porcentagemJogadorDecimal;
+
+                const clientePercentTextEl = document.getElementById('clientePercentText');
+                if (clientePercentTextEl) clientePercentTextEl.textContent = (porcentagemClienteDecimal * 100).toFixed(0);
+                
+                const jogadorPercentTextEl = document.getElementById('jogadorPercentText');
+                if (jogadorPercentTextEl) jogadorPercentTextEl.textContent = (porcentagemJogadorDecimal * 100).toFixed(2);
+
+                const orgValorEl = document.getElementById('orgValor');
+                if (orgValorEl) orgValorEl.textContent = formatarDinheiro(valorOrganizaçao);
+                
+                const clienteValorEl = document.getElementById('clienteValor');
+                if (clienteValorEl) clienteValorEl.textContent = formatarDinheiro(valorCliente);
+                
+                const jogadorValorEl = document.getElementById('jogadorValor');
+                if (jogadorValorEl) jogadorValorEl.textContent = formatarDinheiro(valorJogador);
+                
+                const totalOriginalEl = document.getElementById('totalOriginal');
+                if (totalOriginalEl) totalOriginalEl.textContent = formatarDinheiro(valorTotal);
+
+                const resultadosDiv = document.getElementById('resultadosDiv');
+                if (resultadosDiv) resultadosDiv.style.display = 'block';
+
+            } catch (error) { 
+                console.error("Erro detalhado na função calcularSplits:", error); 
+                alert("Ocorreu um erro inesperado ao calcular: " + error.message + 
+                      "\n\nPor favor, verifique o console do navegador (F12 -> Console) para mais detalhes técnicos e, se possível, reporte este erro.");
+                
+                const resultadosDiv = document.getElementById('resultadosDiv'); 
+                if (resultadosDiv) {
+                    resultadosDiv.style.display = 'none';
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
